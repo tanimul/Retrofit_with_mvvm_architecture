@@ -1,6 +1,7 @@
 package com.example.retrofitwithmvvm;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -25,10 +26,10 @@ import io.reactivex.schedulers.Schedulers;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "Main_Activity";
-//    ViewModel_Country viewModel_country;
-//    List<CountryName> countryNameList;
-//    private CountryNameAdapter countryNameAdapter;
-//    private RecyclerView recyclerView;
+    ViewModel_Country viewModel_country;
+    List<CountryName> countryNameList;
+    private CountryNameAdapter countryNameAdapter;
+    private RecyclerView recyclerView;
 //    private ApiInterface apiInterface;
 //    CompositeDisposable compositeDisposable = new CompositeDisposable();
 
@@ -37,7 +38,37 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-//        viewModel_country = ViewModelProviders.of(this).get(ViewModel_Country.class);
+        viewModel_country = ViewModelProviders.of(this).get(ViewModel_Country.class);
+
+
+//
+//        viewModelEmployee=new ViewModelProvider.AndroidViewModelFactory(getApplication())
+//                .create(ViewModelEmployee.class);
+
+        recyclerView = findViewById(R.id.recyclerview_countrynames);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        countryNameList = new ArrayList<>();
+        countryNameAdapter = new CountryNameAdapter(MainActivity.this, countryNameList);
+        recyclerView.setAdapter(countryNameAdapter);
+
+
+        viewModel_country.getcountryname().observe(MainActivity.this, new Observer<List<CountryName>>() {
+            @Override
+            public void onChanged(List<CountryName> countryNames) {
+                if (countryNames == null) {
+                    Log.d(TAG, "onChanged: got null ModelObject");
+                } else {
+                    Log.d(TAG, "onChanged: Employee name:" + countryNames.get(0).getCountryname());
+                    for (CountryName countryName : countryNames) {
+                        countryNameList.add(new CountryName(countryName.getCountryname()));
+                    }
+                    countryNameAdapter.notifyDataSetChanged();
+
+                }
+            }
+        });
 //        apiInterface = ApiClient.getClient().create(ApiInterface.class);
 //
 //        recyclerView = findViewById(R.id.recyclerview_countrynames);
